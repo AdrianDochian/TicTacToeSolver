@@ -1,62 +1,81 @@
-def getPrice(triple):
-	return triple[1]
-
-def getWeight(triple):
-	return triple[2]
-
-class Catalogue:
-	cakes = []
-
-	def __init__(self, name, price, weight):
-		self.name = name
-		self.price = price
-		self.weight = weight
-		self.cakes.append((name, price, weight))
-
-	def printByPrice(self):
-		print("Ordering by price:")
-		self.cakes.sort(key = getPrice)
-
-		for triple in self.cakes:
-			print(f"{triple[0]} -> costing {triple[1]}$ and weighting {triple[2]}KG")
-
-	def printByWeight(self):
-		print("Ordering by weight:")
-		self.cakes.sort(key = getWeight)
-
-		for triple in self.cakes:
-			print(f"{triple[0]} -> costing {triple[1]}$ weighting {triple[2]}KG")
+class Catalogue():
+	def __init__(self, firstName, lastName):
+		self.firstName = firstName
+		self.lastName = lastName
+		self.absences = 0
+		self.courses = {}
 
 	def __str__(self):
-		return "{} -> ({}, {})".format(self.name, self.price, self.weight)
+		return f"{self.firstName} {self.lastName} has {self.absences} absences!"
 
-class Cake(Catalogue):
-	def setInfo(self, leveled = False, glaze = "Chocolate"):
-		self.leveled = leveled
-		self.glaze = glaze
-
-	def getInfo(self):
-		return "{} -> leveled = {} | glaze = {}".format(self.name, self.leveled, self.glaze)
-
-class Cookie(Catalogue):
-	pass
-
-cake1 = Cake("cake1", 10, 30)
+	def hasAbsented(self):
+		self.absences += 1
 
 
-cake2 = Cake("cake2", 20, 40)
-cake3 = Cake("cake3", 30, 50)
+	def discardAbsences(self, nrOfAbsencesToDiscard):
+		if str(nrOfAbsencesToDiscard).isdigit():
+			nrOfAbsencesToDiscard = int(nrOfAbsencesToDiscard)
+			
+			if nrOfAbsencesToDiscard > self.absences:
+				self.absences = 0
+			else:
+				self.absences -= nrOfAbsencesToDiscard
 
-cookie1 = Cookie("cookie1", 10, 30)
-cookie2 = Cookie("cookie2", 20, 40)
-cookie3 = Cookie("cookie3", 30, 50)
+		else:
+			print("Invalid input at discarding absences!")
 
-cake1.printByWeight()
-cake1.printByPrice()
+class CatalogueUpgraded(Catalogue):
+	def __init__(self, firstName, lastName):
+		super().__init__(firstName, lastName)
 
-cake1.setInfo(True, "Cocoa")
+	def updateCatalogue(self, course, value):
+		self.courses.setdefault(course, value)
+	
+	def showCourses(self):
+		print(f"For {self.firstName} {self.lastName}:")
 
-print(cake1.getInfo())
+		for key in self.courses.keys():
+			print(key)
 
-cake2.setInfo()
-print(cake2.getInfo())
+	def showMeanGrades(self):
+		print(f"For {self.firstName} {self.lastName}:")
+		for key in self.courses.keys():
+			
+			finalGrade = 0
+			gradesCounter = 0
+
+			for nota in self.courses.get(key):
+				
+				if str(nota).isdigit():
+					finalGrade += int(nota)
+					gradesCounter += 1
+
+
+			finalGrade /= gradesCounter 
+			print(f"{key} -> {finalGrade}")
+
+student1 = CatalogueUpgraded("Ion", "Roata")
+student1.hasAbsented()
+student1.hasAbsented()
+student1.hasAbsented()
+student1.discardAbsences(2)
+
+student2 = CatalogueUpgraded("George", "Cerc")
+student2.hasAbsented()
+student2.hasAbsented()
+student2.hasAbsented()
+student2.hasAbsented()
+student2.discardAbsences(2)
+
+print(student1, student2, sep='\n')
+
+student1.updateCatalogue("Python", [6, 7, 8])
+student2.updateCatalogue("Python", [8, 9, 10])
+student2.updateCatalogue("Matematica", [8, 9, 10])
+student1.updateCatalogue("Romana", [6, 7, 8])
+
+student1.showCourses()
+student2.showCourses()
+
+student1.showMeanGrades()
+student2.showMeanGrades()
