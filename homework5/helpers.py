@@ -1,6 +1,6 @@
 from random import randint
 
-DEPTH = 6
+DEPTH = 9
 INF = 666
 
 def initGame():
@@ -62,7 +62,6 @@ def getNextPossibleMoves():
 	return possibleMoves
 
 
-
 def lineIsFull(line):
 	if line[0] == '-':
 		return False
@@ -121,7 +120,7 @@ def printCurrentState():
 		print(*gameState[line])
 		print()
 
-def negamax(depth, side):
+def alpha_beta(depth, side, alpha, beta):
 	info = hasEnded()
 
 	# stop conditions
@@ -139,7 +138,6 @@ def negamax(depth, side):
 
 	line = -1
 	col = -1
-	maxScore = -INF
 
 	# go branch
 	for nextMove in getNextPossibleMoves():
@@ -147,21 +145,24 @@ def negamax(depth, side):
 		gameState[nextMove[0]][nextMove[1]] = side
 		
 		# enter in recursivity
-		fromBranch = negamax(depth - 1, getOpSide(side))
+		fromBranch = alpha_beta(depth - 1, getOpSide(side), -beta, -alpha)
 
 		# update maximum
-		if (-fromBranch[2] >= maxScore):
-			maxScore = -fromBranch[2]
+		if (-fromBranch[2] > alpha):
+			alpha = -fromBranch[2]
 			line = nextMove[0]
 			col = nextMove[1]
 
 		# restore
 		gameState[nextMove[0]][nextMove[1]] = '-'
-	
-	return (line, col, maxScore)
+		
+		# check for cutting branches
+		if (alpha >= beta):
+			return (line, col, alpha)
+
+	return (line, col, alpha)
 
 def updateAsRobot():
-	newMoveInfo = negamax(DEPTH, robotSide)
+	newMoveInfo = alpha_beta(DEPTH, robotSide, -INF, INF)
 
 	setChoice(newMoveInfo[0], newMoveInfo[1], robotSide)
-	
